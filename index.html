@@ -221,7 +221,6 @@
     <button data-mode="match" onclick="switchMode('match')">🃏 配对</button>
     <button data-mode="write" onclick="switchMode('write')">✏️ 写字</button>
     <button data-mode="progress" onclick="switchMode('progress')">📊 进度</button>
-    <button data-mode="files" onclick="switchMode('files')">📚 育儿资源</button>
   </div>
 
   <!-- 进度/课程选择器 -->
@@ -263,22 +262,6 @@
       <span id="matchResult" style="font-size:14px;font-weight:600;color:#7ec8a0;min-height:22px;"></span>
       <button onclick="initMatchGame()" style="padding:6px 20px;border:none;border-radius:30px;font-size:13px;font-weight:600;cursor:pointer;background:#f0e6dc;color:#7a6050;">🔄 重新洗牌</button>
     </div>
-  </div>
-
-  <!-- ===== 育儿资源 ===== -->
-  <div class="card" id="filesPanel" style="display:none;">
-    <div style="font-size:18px;font-weight:600;color:#3d2b1f;margin-bottom:16px;">📚 育儿资源</div>
-    <div style="display:flex;flex-direction:column;gap:12px;text-align:left;">
-      <a href="少年立志-7-14岁.html" target="_blank" style="display:flex;align-items:center;gap:14px;padding:18px 20px;background:#fff;border-radius:18px;border:2px solid #f0e6dc;text-decoration:none;color:#3d2b1f;transition:all 0.2s;" onmouseover="this.style.borderColor='#ff9a76'" onmouseout="this.style.borderColor='#f0e6dc'">
-        <span style="font-size:32px;">🌱</span>
-        <div><div style="font-weight:600;font-size:16px;">少年立志 · 7-14岁</div><div style="font-size:13px;color:#b08a7a;margin-top:2px;">生命四周期 · 第三周期 — 家长认知指南</div></div>
-      </a>
-      <a href="育儿指南-1-6岁.pdf" target="_blank" style="display:flex;align-items:center;gap:14px;padding:18px 20px;background:#fff;border-radius:18px;border:2px solid #f0e6dc;text-decoration:none;color:#3d2b1f;transition:all 0.2s;" onmouseover="this.style.borderColor='#ff9a76'" onmouseout="this.style.borderColor='#f0e6dc'">
-        <span style="font-size:32px;">👶</span>
-        <div><div style="font-weight:600;font-size:16px;">育儿指南 · 1-6岁</div><div style="font-size:13px;color:#b08a7a;margin-top:2px;">儿童成长与教养习惯指南（PDF电子书）</div></div>
-      </a>
-    </div>
-    <div style="margin-top:18px;font-size:13px;color:#c4a090;">💡 点击文件可直接打开或下载</div>
   </div>
 
   <!-- ===== 写字 ===== -->
@@ -1245,7 +1228,6 @@ function switchMode(newMode) {
   document.getElementById('matchPanel').style.display = newMode === 'match' ? 'block' : 'none';
   document.getElementById('writePanel').style.display = newMode === 'write' ? 'block' : 'none';
   document.getElementById('progressPanel').style.display = newMode === 'progress' ? 'block' : 'none';
-  document.getElementById('filesPanel').style.display = newMode === 'files' ? 'block' : 'none';
   if (newMode === 'learn') renderChar(currentIndex);
   if (newMode === 'quiz') { generateQuiz(); renderQuiz(); }
   if (newMode === 'match') initMatchGame();
