@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你的孩子现在在哪个生命周期？</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1e1b16;--ink2:#5a5650;--ink3:#9a9590;
+  --paper:#faf8f3;--warm:#f2ede3;--card:#fff;
+  --gold:#c9922a;--gold-l:#fdf3e0;
+  --green:#3d7a56;--green-l:#e8f5ee;--green-d:#1a4a2e;
+  --blue:#2563a8;--blue-l:#e8f0fb;--blue-d:#0d3570;
+  --amber:#b86e12;--amber-l:#fef0d8;--amber-d:#5c3206;
+  --purple:#5b3d8a;--purple-l:#f0eafa;--purple-d:#2e1a50;
+  --red:#9b2c2c;--red-l:#fdf0f0;
+  --r:18px;--sh:0 3px 22px rgba(0,0,0,0.065);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);font-family:'Noto Sans SC',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px}
+.screen.active{display:flex;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── S1: INTRO ── */
+#s1{background:linear-gradient(160deg,#fdf6e8 0%,#f5f0e6 50%,#faf8f3 100%);text-align:center;position:relative;overflow:hidden}
+#s1::before{content:'';position:absolute;top:-120px;right:-120px;width:400px;height:400px;background:radial-gradient(circle,rgba(201,146,42,.12) 0%,transparent 65%);border-radius:50%}
+.badge{font-size:11px;font-weight:500;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:20px;position:relative}
+.hero-title{font-family:'Noto Serif SC',serif;font-size:clamp(28px,7vw,48px);font-weight:700;line-height:1.25;margin-bottom:16px;position:relative}
+.hero-sub{font-size:15px;color:var(--ink2);line-height:1.8;max-width:420px;margin:0 auto 36px;position:relative}
+.cta{display:inline-block;background:var(--ink);color:#fff;font-size:15px;font-weight:500;padding:16px 44px;border-radius:50px;cursor:pointer;border:none;transition:all .2s;position:relative}
+.cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.18)}
+.foot-tag{margin-top:24px;font-size:13px;color:var(--ink3);position:relative}
+.foot-tag span{color:var(--gold)}
+
+/* ── S2: INPUT ── */
+#s2{text-align:center}
+.q-tag{font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:500;margin-bottom:18px}
+.q-title{font-family:'Noto Serif SC',serif;font-size:clamp(22px,5vw,32px);font-weight:700;margin-bottom:36px;line-height:1.4}
+.age-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:440px;margin:0 auto 32px}
+.age-btn{width:56px;height:56px;border-radius:14px;border:1.5px solid rgba(0,0,0,0.1);background:var(--card);font-size:18px;font-weight:500;color:var(--ink);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.age-btn:hover{border-color:var(--gold);background:var(--gold-l)}
+.age-btn.sel{border-color:var(--gold);background:var(--gold);color:#fff;transform:scale(1.08)}
+.age-btn .unit{font-size:10px;font-weight:400;margin-left:1px}
+.go-btn{display:inline-block;background:var(--ink);color:#fff;font-size:15px;font-weight:500;padding:14px 48px;border-radius:50px;cursor:pointer;border:none;transition:all .2s;opacity:.35;pointer-events:none}
+.go-btn.on{opacity:1;pointer-events:auto}
+.go-btn.on:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.15)}
+
+/* ── S3: RESULT ── */
+#s3{padding:0;justify-content:flex-start;align-items:stretch}
+.res-header{padding:52px 24px 40px;text-align:center;position:relative;overflow:hidden}
+.res-header::before{content:'';position:absolute;top:-80px;right:-80px;width:280px;height:280px;border-radius:50%;opacity:.12}
+.res-stag{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+.res-title{font-family:'Noto Serif SC',serif;font-size:clamp(32px,8vw,52px);font-weight:700;line-height:1.2;margin-bottom:6px}
+.res-age-label{font-size:15px;font-weight:300;letter-spacing:1px;margin-bottom:18px}
+.res-insight{display:inline-block;max-width:520px;font-size:14.5px;line-height:1.7;padding:14px 24px;border-radius:14px;text-align:left}
+
+.res-body{max-width:720px;margin:0 auto;padding:0 20px 80px;width:100%}
+
+/* theory */
+.th-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:36px}
+@media(max-width:500px){.th-row{grid-template-columns:1fr}}
+.th-card{background:var(--card);border-radius:16px;padding:20px 22px;box-shadow:var(--sh)}
+.th-tag{font-size:10px;letter-spacing:2px;font-weight:500;text-transform:uppercase;margin-bottom:8px}
+.th-q{font-family:'Noto Serif SC',serif;font-size:14px;line-height:1.8;color:var(--ink)}
+
+/* section label */
+.sl{font-size:11px;letter-spacing:2.5px;font-weight:500;text-transform:uppercase;margin:0 0 14px;padding-top:32px}
+
+/* year detail card */
+.year-card{background:var(--card);border-radius:16px;padding:26px 26px 24px;box-shadow:var(--sh);margin-bottom:14px}
+.year-card h3{font-size:16px;font-weight:500;margin-bottom:6px}
+.year-card .y-sub{font-size:13px;margin-bottom:16px;font-weight:300;letter-spacing:.5px}
+.yl{list-style:none;display:flex;flex-direction:column;gap:10px}
+.yl li{font-size:14px;color:var(--ink2);line-height:1.65;padding-left:20px;position:relative}
+.yl li::before{content:'›';position:absolute;left:0;font-size:17px;line-height:1.2}
+.yl li strong{font-weight:500;color:var(--ink)}
+
+/* role */
+.role-card{border-radius:16px;padding:24px 26px;margin-bottom:28px}
+.role-card .rt{font-size:14px;font-weight:500;margin-bottom:10px}
+.role-card p{font-size:14px;line-height:1.75}
+.role-card p strong{font-weight:500}
+
+/* dont */
+.dl{display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
+.di{background:var(--card);border-radius:16px;padding:20px 22px;box-shadow:var(--sh);border-left:3px solid var(--red)}
+.dh{display:flex;gap:10px;align-items:flex-start;margin-bottom:7px}
+.dx{flex-shrink:0;width:20px;height:20px;background:var(--red-l);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--red);margin-top:2px}
+.dt{font-size:14px;font-weight:500;color:var(--ink);line-height:1.4}
+.dw{font-size:13px;color:var(--ink2);line-height:1.7;padding-left:30px}
+.dw em{font-style:normal;color:var(--red);font-weight:500}
+
+/* share */
+.share-box{text-align:center;background:var(--card);border-radius:20px;padding:32px 24px;box-shadow:var(--sh);margin-bottom:20px}
+.share-box h3{font-family:'Noto Serif SC',serif;font-size:17px;margin-bottom:8px}
+.share-box p{font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:20px}
+.sbtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.sbtn{padding:10px 26px;border-radius:50px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .2s}
+.sbtn.p{background:var(--ink);color:#fff}
+.sbtn.p:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,0.15)}
+.sbtn.s{background:var(--warm);color:var(--ink);border:1px solid rgba(0,0,0,0.08)}
+
+/* stage nav */
+.snav{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px}
+.sp{font-size:11px;padding:5px 13px;border-radius:20px;border:1px solid rgba(0,0,0,0.1);color:var(--ink3);background:var(--paper);cursor:pointer;transition:all .15s;white-space:nowrap}
+.sp:hover{background:var(--warm)}
+.sp.on{font-weight:500}
+
+/* theme colors */
+.t-green .res-header{background:linear-gradient(160deg,#dff5ea 0%,#eef8f2 60%,var(--paper) 100%)}
+.t-green .res-header::before{background:radial-gradient(circle,var(--green) 0%,transparent 65%)}
+.t-green .res-stag,.t-green .th-tag,.t-green .sl{color:var(--green)}
+.t-green .res-title{color:var(--green)}
+.t-green .res-insight{background:var(--green-l);color:var(--green-d)}
+.t-green .year-card{border-left:3px solid var(--green)}
+.t-green .yl li::before{color:var(--green)}
+.t-green .role-card{background:var(--green-l);color:var(--green-d)}
+.t-green .role-card .rt{color:var(--green)}
+.t-green .sp.on{border-color:var(--green);color:var(--green);background:var(--green-l)}
+.t-green .th-card{border-top:3px solid var(--green)}
+
+.t-blue .res-header{background:linear-gradient(160deg,#dbe9fb 0%,#edf3fd 60%,var(--paper) 100%)}
+.t-blue .res-header::before{background:radial-gradient(circle,var(--blue) 0%,transparent 65%)}
+.t-blue .res-stag,.t-blue .th-tag,.t-blue .sl{color:var(--blue)}
+.t-blue .res-title{color:var(--blue)}
+.t-blue .res-insight{background:var(--blue-l);color:var(--blue-d)}
+.t-blue .year-card{border-left:3px solid var(--blue)}
+.t-blue .yl li::before{color:var(--blue)}
+.t-blue .role-card{background:var(--blue-l);color:var(--blue-d)}
+.t-blue .role-card .rt{color:var(--blue)}
+.t-blue .sp.on{border-color:var(--blue);color:var(--blue);background:var(--blue-l)}
+.t-blue .th-card{border-top:3px solid var(--blue)}
+
+.t-amber .res-header{background:linear-gradient(160deg,#fef3da 0%,#fef8ed 60%,var(--paper) 100%)}
+.t-amber .res-header::before{background:radial-gradient(circle,var(--amber) 0%,transparent 65%)}
+.t-amber .res-stag,.t-amber .th-tag,.t-amber .sl{color:var(--amber)}
+.t-amber .res-title{color:var(--amber)}
+.t-amber .res-insight{background:var(--amber-l);color:var(--amber-d)}
+.t-amber .year-card{border-left:3px solid var(--amber)}
+.t-amber .yl li::before{color:var(--amber)}
+.t-amber .role-card{background:var(--amber-l);color:var(--amber-d)}
+.t-amber .role-card .rt{color:var(--amber)}
+.t-amber .sp.on{border-color:var(--amber);color:var(--amber);background:var(--amber-l)}
+.t-amber .th-card{border-top:3px solid var(--amber)}
+
+.t-purple .res-header{background:linear-gradient(160deg,#e8e0f8 0%,#f2eefa 60%,var(--paper) 100%)}
+.t-purple .res-header::before{background:radial-gradient(circle,var(--purple) 0%,transparent 65%)}
+.t-purple .res-stag,.t-purple .th-tag,.t-purple .sl{color:var(--purple)}
+.t-purple .res-title{color:var(--purple)}
+.t-purple .res-insight{background:var(--purple-l);color:var(--purple-d)}
+.t-purple .year-card{border-left:3px solid var(--purple)}
+.t-purple .yl li::before{color:var(--purple)}
+.t-purple .role-card{background:var(--purple-l);color:var(--purple-d)}
+.t-purple .role-card .rt{color:var(--purple)}
+.t-purple .sp.on{border-color:var(--purple);color:var(--purple);background:var(--purple-l)}
+.t-purple .th-card{border-top:3px solid var(--purple)}
+</style>
+</head>
+<body>
+
+<div class="screen active" id="s1">
+  <div class="badge">生命四周期 · 家长认知指南</div>
+  <h1 class="hero-title">你的孩子<br>现在在哪个<br>生命周期？</h1>
+  <p class="hero-sub">选择孩子的年龄，获取这个阶段最精准的认知指南——包括他正在经历什么，以及你最不该做的事。</p>
+  <button class="cta" onclick="go('s2')">选择孩子年龄</button>
+  <p class="foot-tag">基于 <span>孔子教育思想 × Stanford Tina Seelig</span> 创新理论</p>
+</div>
+
+<div class="screen" id="s2">
+  <div class="q-tag">选择年龄</div>
+  <div class="q-title">孩子今年几岁？</div>
+  <div class="age-grid" id="ageGrid"></div>
+  <button class="go-btn" id="goBtn" onclick="showResult()">查看指南 →</button>
+</div>
+
+<div class="screen" id="s3"><div id="rc"></div></div>
+
+<script>
+let selAge = null;
+
+// Build age buttons
+const grid = document.getElementById('ageGrid');
+for(let i=0;i<=21;i++){
+  const b=document.createElement('button');
+  b.className='age-btn';
+  b.innerHTML = i < 1 ? '0<span class="unit">岁</span>' : i+'<span class="unit">岁</span>';
+  b.onclick=()=>{
+    document.querySelectorAll('.age-btn').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');
+    selAge=i;
+    document.getElementById('goBtn').classList.add('on');
+  };
+  grid.appendChild(b);
+}
+
+// ═══════════════════════════════════════════
+// 配置：付款码
+// 把你的微信/支付宝收款码图片上传后，把下面的路径改成实际地址
+// 例如: "https://ryan-102.github.io/literacy-app/pay-qr.png"
+// ═══════════════════════════════════════════
+const PAY_QR_IMAGE = ""; // ← 在这里填入你的付款码图片地址
+
+// ── DATA ──
+const YEARS = {
+  0:{
+    yearTitle:'你的0岁宝宝',yearSub:'出生 — 12个月',
+    items:[
+      '这是<strong>世界感受系统的初始化阶段</strong>。宝宝通过吸吮、抓握、注视来启动与世界的第一次连接',
+      '3个月前后出现<strong>社会性微笑</strong>——这是他第一次主动向世界发出「我在这里」的信号',
+      '6个月前后开始<strong>认生</strong>，这不是退步，是他开始分辨「安全」与「未知」——判断力的萌芽',
+      '每一次哭泣、伸手、翻身，都是人生最早的<strong>原型实验</strong>：我能让世界回应我吗？',
+      '不需要任何早教课程。他只需要：<strong>被看见、被回应、被允许触碰真实的世界</strong>',
+    ]
+  },
+  1:{
+    yearTitle:'你的1岁孩子',yearSub:'12 — 24个月',
+    items:[
+      '开始独立行走——这是他第一次用自己的身体<strong>主动靠近世界</strong>，行动偏好（Bias toward Action）在此刻点亮',
+      '说出第一批有意义的词，但<strong>理解力远超表达力</strong>。他听得懂很多，只是还说不出来',
+      '18个月前后进入「什么都想碰」的阶段——这不是调皮，是<strong>原型实验的高峰期</strong>：碰一下，会发生什么？',
+      '分离焦虑开始显现：离开妈妈就哭，是因为他的世界地图里<strong>安全基地只有一个</strong>',
+      '开始出现「不要」——这是<strong>自我意识的第一次宣告</strong>，不是叛逆',
+    ]
+  },
+  2:{
+    yearTitle:'你的2岁孩子',yearSub:'24 — 36个月',
+    items:[
+      '进入著名的「Terrible Twos」——本质是<strong>自我意识与能力之间的巨大落差</strong>：想法很多，但身体和语言跟不上',
+      '频繁说「不」和「我的」——他在练习<strong>人生第一个边界感</strong>：什么是我的，什么是我能决定的',
+      '情绪崩溃频繁且剧烈：因为<strong>前额叶还未发育完成</strong>，他没有能力「控制」情绪，只能被情绪淹没',
+      '平行游戏为主（在旁边各玩各的）——<strong>社交能力还在观察期</strong>，强迫分享没有任何意义',
+      '假装游戏出现（假装打电话、喂玩偶）——<strong>象征性思维的萌芽</strong>，这是未来创造力的前置能力',
+    ]
+  },
+  3:{
+    yearTitle:'你的3岁孩子',yearSub:'36 — 48个月',
+    items:[
+      '从养性过渡到<strong>养正</strong>的关键转折——孩子开始能理解简单规则，秩序感开始生长',
+      '「我自己来」成为口头禅——这正是<strong>Prototyping的雏形</strong>：通过自己动手来认识世界',
+      '开始问<strong>「为什么？」</strong>——不是在刁难你，是认知系统第一次启动因果推理功能',
+      '能玩合作游戏了，开始理解<strong>轮流、等待、简单的协商</strong>——社会认知快速发展',
+      '情绪仍然波动大，但开始能<strong>用语言命名感受</strong>（「我生气了」）——情绪教育的黄金窗口打开了',
+    ]
+  },
+  4:{
+    yearTitle:'你的4岁孩子',yearSub:'48 — 60个月',
+    items:[
+      '<strong>能量达到巅峰</strong>：跑、跳、爬、闹——身体是他认识世界的第一工具，精力旺盛是Prototyping的燃料',
+      '想象力爆发，<strong>分不清现实和幻想</strong>：说「我看到怪兽了」不是撒谎，是大脑在练习虚构能力',
+      '开始有<strong>明确的好朋友</strong>，也开始出现排斥、告状——他在用真实的关系做社交原型实验',
+      '喜欢夸大其词和吹牛——这是<strong>语言能力快速发展</strong>的副产品，他在试探语言的力量边界',
+      '对规则既在意又爱挑战——<strong>边界感正在内化的过程</strong>：他需要知道线在哪里，然后安心地在线内探索',
+    ]
+  },
+  5:{
+    yearTitle:'你的5岁孩子',yearSub:'60 — 72个月',
+    items:[
+      '进入<strong>养正阶段的成熟期</strong>：习惯系统开始稳定，能完成有始有终的小任务',
+      '开始对「对错」有朴素但坚定的判断——<strong>价值观的雏形正在形成</strong>（善良、公平、合作）',
+      '自我效能感的关键期：<strong>「我能自己做到」</strong>这件事对他来说无比重要，每次被替代都是一次打击',
+      '开始有<strong>真正的好奇心驱动的学习行为</strong>：不是因为被要求，而是因为「我想知道」',
+      '情绪管理明显进步，<strong>能用协商代替哭闹</strong>——但疲惫和饥饿时仍会退回低龄模式，这完全正常',
+    ]
+  },
+  6:{
+    yearTitle:'你的6岁孩子',yearSub:'72 — 84个月',
+    items:[
+      '养正向立志的<strong>过渡期</strong>：开始对「我喜欢什么」有了更持久的偏好，而不只是随机探索',
+      '进入学校系统——第一次面对<strong>外部评价体系</strong>。父母的任务是帮他建立「内在标准」而非依赖外部分数',
+      '竞争意识萌芽：在意输赢、在意排名——<strong>这是正常的</strong>，但需要引导他从「赢别人」转向「超越自己」',
+      '<strong>同伴关系变得极其重要</strong>：开始真正在意朋友的看法，社交冲突会带来真实的情绪波动',
+      '注意力能维持更久，但<strong>仍然需要通过动手和体验来学习</strong>——坐着听讲不是这个年龄的最佳学习方式',
+    ]
+  },
+  7:{ yearTitle:'你的7岁孩子',yearSub:'少年立志初期', items:['进入第三周期<strong>「少年立志」</strong>——开始向内看，第一次问「我喜欢什么」','对某些事情开始有<strong>超出随机的持续兴趣</strong>：这是立志的最早信号','<strong>内心世界变得丰富</strong>：可能变得安静、沉思、甚至有点「宅」——这是向内探索的正常表现','开始在意<strong>自己做得好不好</strong>，自我评价系统启动，非常需要「我做到了」的小成功','对规则和公平<strong>极度敏感</strong>：「这不公平！」是这个年龄的标志性语言']},
+  8:{ yearTitle:'你的8岁孩子',yearSub:'兴趣开始聚焦', items:['兴趣开始从广泛探索走向<strong>初步聚焦</strong>——可能对飞机、昆虫、画画、某项运动特别着迷','<strong>沉浸感（flow）第一次出现</strong>：能为一件喜欢的事专注很久，这是「发动机启动」的标志','开始区分「我擅长什么」和「我喜欢什么」——<strong>自我认知的精细化</strong>','友谊变得更深：开始有<strong>真正的知心好友</strong>，也开始经历友谊的复杂性','对<strong>真实世界的运作方式</strong>产生浓厚兴趣：钱怎么来的？飞机怎么飞的？人为什么会死？']},
+  9:{ yearTitle:'你的9岁孩子',yearSub:'独立意识觉醒', items:['<strong>独立意识显著增强</strong>：不再事事需要父母参与，开始有自己的小世界','同伴认同变得比父母认同更重要——<strong>这不是疏远你</strong>，是社会化的正常进程','开始有<strong>自我批评的能力</strong>：「我画得不好」「我不如他」——需要帮他看到过程而非只盯结果','<strong>道德推理能力提升</strong>：不再只是「被告知什么是对的」，而是开始自己判断','能做<strong>更复杂的项目</strong>：一个小实验、一个模型、一篇短文——每次完成，力量感都在积累']},
+  10:{ yearTitle:'你的10岁孩子',yearSub:'Prototyping加速', items:['<strong>身体和认知都进入加速期</strong>，前青春期的荷尔蒙变化开始若隐若现','可能突然对某件事<strong>废寝忘食</strong>——壁球、编程、阅读、手工——这是Prototyping的高速运转','开始在意<strong>「我在别人眼中是什么样的」</strong>，自我形象意识显著增强','能做出<strong>更成熟的选择</strong>，但情绪调节能力还不稳定——理智和冲动之间经常拉锯','这是从「被照顾的孩子」向「有主见的少年」过渡的关键年——<strong>父母的放手要跟上他的成长</strong>']},
+  11:{ yearTitle:'你的11岁孩子',yearSub:'志向萌芽期', items:['<strong>少年立志的信号开始明确</strong>：不只是「我喜欢」，开始出现「我想成为」','社交世界变得复杂：<strong>小团体、排斥、归属感焦虑</strong>——这些都是真实的情感体验','<strong>批判性思维萌芽</strong>：开始质疑规则、质疑大人说的话——这是好事，是思维成熟的标志','身体变化开始加速：<strong>需要正确的身体教育</strong>，而不是回避','能独立完成有一定复杂度的项目——<strong>给他真实的任务和真实的成就感</strong>']},
+  12:{ yearTitle:'你的12岁孩子',yearSub:'少年立志成熟期', items:['<strong>内在世界急剧扩展</strong>：开始思考抽象问题——正义、友谊的本质、自己的未来','对父母的态度开始<strong>从崇拜转向审视</strong>——这不是不爱你，是他在建构独立的判断系统','<strong>同伴关系达到巅峰重要性</strong>：被朋友接纳或排斥，可能比任何学业问题都更影响情绪','兴趣如果足够深入，开始出现<strong>真正的技能积累</strong>——从「玩」变成「练」','即将进入第四周期，<strong>关键思考力的地基</strong>正在这里打下——允许他质疑、讨论、辩论']},
+  13:{ yearTitle:'你的13岁孩子',yearSub:'立志与养德的过渡', items:['<strong>青春期正式到来</strong>：荷尔蒙、身体变化、情绪波动——他自己也在适应这个新的自己','开始<strong>强烈需要隐私</strong>：关门、不想说话、日记不让看——这是健康的边界意识','<strong>价值观开始真正形成</strong>：不再只是接受大人的标准，开始有自己的判断体系','对<strong>公平、正义、社会问题</strong>可能突然产生强烈关注——关键思考力在启动','父母的角色要开始转型：从「教练」向「对话者」过渡——<strong>问他怎么想，比告诉他怎么做更重要</strong>']},
+  14:{ yearTitle:'你的14岁孩子',yearSub:'青年养德起点', items:['正式进入第四周期<strong>「青年养德」</strong>——第一次用自己的眼睛看世界','<strong>质疑一切</strong>：父母的观点、学校的规则、社会的标准——这是心智成熟的必要门槛','开始真正问：<strong>「我是谁？我想成为什么样的人？」</strong>——不是叛逆，是觉醒','<strong>信息判断能力需要急迫提升</strong>：AI时代信息过载，他需要学会区分事实与观点','父母给出空间比给出答案更重要——<strong>他需要被信任，而不是被管控</strong>']},
+  15:{ yearTitle:'你的15岁孩子',yearSub:'关键思考力建设期', items:['<strong>抽象思维能力显著增强</strong>：能做假设推理、能从多个角度看问题','可能经历<strong>第一次深度的自我怀疑</strong>：「我够好吗？我的努力有意义吗？」——价值感在锻造中','<strong>同伴影响力达到顶峰</strong>：朋友圈的价值观可能比父母的影响更直接','开始对<strong>未来有模糊但真实的想象</strong>：大学、职业、生活方式——这些不需要确定答案，需要被讨论','父母需要学会<strong>忍受不确定</strong>：他的路不需要你能看清，你只需要在他探索时点亮灯']},
+  16:{ yearTitle:'你的16岁孩子',yearSub:'价值觉醒期', items:['可能经历<strong>第一次与真实世界的碰撞</strong>：实习、打工、社会实践——开始理解「成人世界的规则」','AI时代加速了他的觉醒：<strong>「我不想当牛马」</strong>不是矫情，是对工业时代价值观的真实反思','<strong>关键思考力进入实战阶段</strong>：不只是思考「对不对」，还在思考「值不值」','开始有能力做<strong>对自己负责的选择</strong>——即使选错了，那也是他的学习素材','父母最大的考验：<strong>能不能放手让他做一个你不认同但对他有意义的决定？</strong>']},
+  17:{ yearTitle:'你的17岁孩子',yearSub:'自我导航启动', items:['<strong>自我认知日趋清晰</strong>：知道自己擅长什么、在意什么、想往哪个方向走','面临重大选择（高考/留学/专业方向）——<strong>焦虑是正常的</strong>，但选择能力必须是他自己的','<strong>能进行系统性思考</strong>：理解因果、看见结构、在复杂中找到重点','对父母的关系开始<strong>从对抗走向理解</strong>——如果之前的基础打好了，这时候会开始真正的对话','他需要的不是你替他选路，而是<strong>「无论你选什么，我都在」</strong>的安全感']},
+  18:{ yearTitle:'你的18岁孩子',yearSub:'成为自己的开始', items:['法律意义上的成人，心理发展上<strong>仍在「成为自己」的路上</strong>','离开家庭（大学/工作）——<strong>第一次独立面对世界</strong>，所有前面阶段积累的能力在此刻接受检验','<strong>价值判断能力的真正考验</strong>：没有父母的日常影响，他如何判断、如何选择？','可能经历<strong>第一次真正的失败和挫折</strong>——能不能接住自己，取决于前18年积累的内在力量','父母的角色：<strong>永远的港湾，而不是永远的舵手</strong>']},
+  19:{ yearTitle:'你的19岁孩子',yearSub:'价值体验深化', items:['开始<strong>在真实世界中检验自己的价值观</strong>：什么对我真正重要？我愿意为什么付出代价？','人际关系进入<strong>更深的层次</strong>：可能经历深刻的友谊、爱情、失去——这些都是价值观的锻造材料','<strong>开始理解「自由」的代价</strong>：选择意味着放弃，独立意味着承担','对社会和世界的理解<strong>从简单变得复杂</strong>——不再是非黑即白','父母能做的：<strong>被需要时出现，不被需要时安静存在</strong>']},
+  20:{ yearTitle:'你的20岁孩子',yearSub:'创造自我价值', items:['开始<strong>寻找和创造属于自己的价值</strong>：不只是学习，而是开始「做出来」','<strong>能力感和意义感</strong>成为驱动力的核心：「我能创造什么影响？」','对未来的规划从<strong>模糊走向具体</strong>，但仍允许调整——Life Design的核心就是迭代','<strong>与父母的关系趋向成熟</strong>：如果基础好，这时候他会主动寻求你的建议而非对抗','孔子说十五而志于学——<strong>20岁的他正在用自己的行动定义「学」的含义</strong>']},
+  21:{ yearTitle:'你的21岁孩子',yearSub:'走向世界', items:['<strong>四个生命周期基本完成</strong>：感受力、秩序感、志向、判断力——这些就是他带进成人世界的全部装备','如果前面每个阶段都被善待，此刻他拥有的是：<strong>敢于行动的勇气、清晰的内在秩序、属于自己的方向、独立思考的能力</strong>','他不需要你的人生剧本，他需要<strong>写自己的故事</strong>','Tina Seelig 说的「人生设计」，在这里真正开始——而所有原材料，都来自0–21年间每一个被看见的瞬间','<strong>父母最终极的任务：放手，然后欣赏</strong>']}
+};
+
+const STAGES = [
+  {
+    range:[0,3],theme:'t-green',tag:'第一周期 · 养性',title:'养性',age:'0 — 3 岁',
+    insight:'这不是学习期，是世界感受系统的建构期。创造力不是智力，而是「没有被世界吓退」的能力。',
+    quotes:[{tag:'东方智慧 · 孔子',q:'「养性，生命刚萌芽时对世界的第一种气息。」'},{tag:'Stanford · Tina Seelig',q:'"When people feel seen, they begin to see possibilities."'}],
+    roleTitle:'你的任务：给真实，给稳定，让他参与',
+    roleBody:'给真实世界（水、沙、土、光线），而非刺激世界。给<strong>稳定的回应</strong>，不需要完美。让孩子成为家庭生活的一部分，而非被安排的对象。',
+    donts:[
+      {t:'不用刺激代替真实',w:'感受力从真实世界长出来。<em>过度刺激破坏对细微感受的捕捉力。</em>'},
+      {t:'不以「完美回应」为目标',w:'焦虑的父母传递「世界不安全」的信号。<em>稳定的不完美，胜过紧绷的完美。</em>'},
+      {t:'不把孩子当「被安排的对象」',w:'家庭生活本身就是原型实验室。<em>看妈妈切菜，胜过消费式活动。</em>'},
+      {t:'不用「不许动/不许碰」限制探索',w:'频繁被阻止的孩子，面对新问题会退缩。<em>每次阻止都在削减行动偏好。</em>'},
+      {t:'不用语言教育代替身体陪伴',w:'0–3岁世界观建立于身体经验。<em>一个抱抱胜过一千句「妈妈爱你」。</em>'},
+      {t:'不把里程碑当考核标准',w:'父母焦虑直接传递「我不够好」。<em>这是最危险的底层编码。</em>'},
+    ]
+  },
+  {
+    range:[3,7],theme:'t-blue',tag:'第二周期 · 养正',title:'养正',age:'3 — 7 岁',
+    insight:'「我自己来」是宣言，不是叛逆。这正是 Prototyping 的雏形：通过做一点点来认识世界。',
+    quotes:[{tag:'东方智慧 · 孔子',q:'「蒙以养正，是一生之始。正其心，方能立其身。」'},{tag:'Stanford · Tina Seelig',q:'"孩子需要通过行动，而不是指令，来理解世界。"'}],
+    roleTitle:'你的任务：引导方向，不是降低能量',
+    roleBody:'孩子是能量永动机——这份能量是 Prototyping 的燃料。把生活交还给孩子，让他在真实的小事里建构秩序感。先<strong>锻炼好自己的身体</strong>，才能跟得上他的节奏。',
+    donts:[
+      {t:'不把「乖」当教育目标',w:'养正目的是与世界正向连接，不是培养服从。<em>「乖」让孩子把「我的想法不重要」编入认知。</em>'},
+      {t:'不替孩子做他能自己做的事',w:'每次接管就是「我的尝试不被需要」的信号。<em>self-efficacy在此漏掉。</em>'},
+      {t:'不在情绪爆发时立刻训诫',w:'讲道理的时机永远是平静之后。<em>此刻他需要被看见，而非被评判。</em>'},
+      {t:'不用羞耻感强化规矩',w:'羞耻感让孩子绕开尝试。<em>边界是让孩子「敢做事」，不是「怕做错」。</em>'},
+      {t:'不强迫立刻分享或道歉',w:'真正的善良从内在长出来。<em>孔子说「导之以礼，齐之以乐」——引导，不是强制。</em>'},
+      {t:'不把「精力旺盛」当问题',w:'这份能量是 Prototyping 的燃料。<em>管控它等于扼杀探索的动力。</em>'},
+    ]
+  },
+  {
+    range:[7,14],theme:'t-amber',tag:'第三周期 · 少年立志',title:'少年立志',age:'7 — 14 岁',
+    insight:'立志不是要孩子立大志，而是让他第一次看见真正的自己。兴趣多变不是三分钟热度，是在向世界发问：「这里是不是属于我？」',
+    quotes:[{tag:'东方智慧 · 孔子',q:'「知之者不如好之者，好之者不如乐之者。」'},{tag:'Stanford · Tina Seelig',q:'"创造力的燃料，就是好奇 + 反馈。"'}],
+    roleTitle:'你的任务：从「规划者」转为「让路者」',
+    roleBody:'看见发光点，而不是急着定义它。允许孩子长时间沉浸某件事，给他试错的余地。成为孩子<strong>可以安全探索的土壤</strong>——而不是预先铺好的轨道。',
+    donts:[
+      {t:'不把「三分钟热度」当问题',w:'兴趣多变是立志萌芽期。<em>你的评判，可能提前终止了一次真实的探索。</em>'},
+      {t:'不聚焦结果忽视过程',w:'只盯结果的孩子，把努力的意义外包给他人评价。<em>让孩子复盘「我做对了哪些」。</em>'},
+      {t:'不替孩子规划志向',w:'志向在真实体验中长出来。<em>父母的任务是让路，不是指路。</em>'},
+      {t:'不用比较来激励',w:'比较让注意力从「我能做什么」转向「我比别人差在哪」。<em>方向截然相反。</em>'},
+      {t:'不打断孩子难得的沉浸状态',w:'一次深度沉浸胜过十次浅层练习。<em>允许孩子废寝忘食地做他真正在乎的事。</em>'},
+      {t:'不在完成小事后立刻批评不足',w:'先放大小成功，才能给继续冒险的勇气。<em>批评可以有，但时机和比例决定一切。</em>'},
+    ]
+  },
+  {
+    range:[14,22],theme:'t-purple',tag:'第四周期 · 青年养德',title:'青年养德',age:'14 — 21 岁',
+    insight:'这是孩子第一次用自己的眼睛看世界。质疑权威不是叛逆，是心智成熟的必要门槛。',
+    quotes:[{tag:'东方智慧 · 孔子',q:'「格物致知，知所先后，则近道矣。君子不器。」'},{tag:'Stanford · Tina Seelig',q:'"价值不是教出来的，是体验出来的。"'}],
+    roleTitle:'你的任务：从「教练」转为「对话者」',
+    roleBody:'问「你在想什么」，而不是「你怎么又不听我的」。当孩子开始自己思考，不是关门，而是<strong>点灯</strong>。给真实任务、真实失败、真实影响力体验。',
+    donts:[
+      {t:'不把「质疑」当叛逆',w:'能质疑才能思考，能思考才能建立判断力。<em>迷茫是心智成熟的前兆。</em>'},
+      {t:'不继续用「指挥者」模式沟通',w:'14岁后父母要转型为对话者。<em>「你在想什么」比「你应该怎样」更有力量。</em>'},
+      {t:'不用「稳定工作」定义成功',w:'不要用工业时代旧框架回应AI时代的新觉醒。<em>他在探索「人更像人」的可能性。</em>'},
+      {t:'不替孩子判断信息真假',w:'Critical Thinking在真实判断练习中建立。<em>保护伞下长不出判断力。</em>'},
+      {t:'不试图把价值观「教给」孩子',w:'给真实任务、真实失败、真实影响力体验。<em>价值从体验中长出来。</em>'},
+      {t:'不以「我都是为你好」终止对话',w:'孩子不是满足父母期待的工具。<em>情感绑架代替不了真实沟通。</em>'},
+    ]
+  }
+];
+
+function getStage(age){for(const s of STAGES){if(age>=s.range[0]&&age<s.range[1]) return s;} return null;}
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+
+function showResult(){
+  if(selAge===null) return;
+  const stage=getStage(selAge);
+  if(!stage) return;
+  const yr=YEARS[selAge];
+  renderResult(stage,yr,selAge);
+  go('s3');
+}
+
+function renderResult(s,yr,age){
+  const donts=s.donts.map(d=>`<div class="di"><div class="dh"><div class="dx">✕</div><div class="dt">${d.t}</div></div><div class="dw">${d.w}</div></div>`).join('');
+  const pills=STAGES.map(st=>`<span class="sp ${st.tag===s.tag?'on':''}" onclick="jumpStage(${st.range[0]})">${st.title}</span>`).join('');
+
+  let yearHtml='';
+  if(yr){
+    yearHtml=`
+      <div class="sl">你的${age}岁孩子正在经历什么</div>
+      <div class="year-card">
+        <h3>${yr.yearTitle}</h3>
+        <div class="y-sub">${yr.yearSub}</div>
+        <ul class="yl">${yr.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+      </div>`;
+  }
+
+  document.getElementById('rc').innerHTML=`
+    <div class="${s.theme}" style="width:100%">
+      <div class="res-header">
+        <div class="res-stag">${s.tag}</div>
+        <div class="res-title">${s.title}</div>
+        <div class="res-age-label">${s.age}</div>
+        <div class="res-insight">${s.insight}</div>
+      </div>
+      <div class="res-body">
+        <div class="th-row">
+          ${s.quotes.map(q=>`<div class="th-card"><div class="th-tag">${q.tag}</div><div class="th-q">${q.q}</div></div>`).join('')}
+        </div>
+        ${yearHtml}
+        <div class="sl">父母的任务</div>
+        <div class="role-card"><div class="rt">${s.roleTitle}</div><p>${s.roleBody}</p></div>
+        <div class="sl">🚫 父母不做清单</div>
+        <div class="dl">${donts}</div>
+        <div class="share-box">
+          <h3>转发给同龄孩子的父母</h3>
+          <p>每个阶段的孩子，都需要不同的陪伴方式。</p>
+          <div class="sbtns">
+            <button class="sbtn p" onclick="copyLink()">复制链接分享</button>
+            <button class="sbtn s" onclick="go('s2')">查看其他年龄</button>
+          </div>
+        </div>
+
+        <!-- 付款码 -->
+        <div class="pay-box" style="text-align:center;background:var(--card);border-radius:20px;padding:32px 24px;box-shadow:var(--sh);margin-bottom:20px;">
+          <h3 style="font-family:'Noto Serif SC',serif;font-size:16px;margin-bottom:6px;">☕ 如果这份指南对你有帮助</h3>
+          <p style="font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:16px;">你的支持，能帮助我们持续创作更多优质内容。<br>长按识别二维码，请我们喝杯咖啡 ☕</p>
+          <div style="display:inline-block;background:#fff;padding:12px;border-radius:16px;border:2px dashed #e0d8cc;">
+            <img id="payQRCode" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23f5f0e6'/%3E%3Ctext x='90' y='70' text-anchor='middle' fill='%239a9590' font-size='14' font-family='sans-serif'%3E请上传付款码%3C/text%3E%3Ctext x='90' y='100' text-anchor='middle' fill='%239a9590' font-size='12' font-family='sans-serif'%3E替换 PAY_QR_IMAGE%3C/text%3E%3Ctext x='90' y='120' text-anchor='middle' fill='%239a9590' font-size='12' font-family='sans-serif'%3E变量%3C/text%3E%3C/svg%3E" alt="赞赏码" style="width:180px;height:180px;display:block;border-radius:8px;">
+          </div>
+          <p style="font-size:12px;color:var(--ink3);margin-top:12px;">微信 / 支付宝 均可</p>
+        </div>
+        <div class="snav">${pills}</div>
+      </div>
+    </div>`;
+}
+
+function jumpStage(startAge){selAge=startAge;const s=getStage(startAge);const yr=YEARS[startAge];if(s){renderResult(s,yr,startAge);window.scrollTo(0,0);}}
+function copyLink(){navigator.clipboard.writeText(window.location.href).then(()=>alert('链接已复制，快去分享吧')).catch(()=>alert('请手动复制当前页面链接'));}
+
+// 初始化付款码
+if(PAY_QR_IMAGE){document.getElementById('payQRCode').src=PAY_QR_IMAGE;}
+</script>
+</body>
+</html>
