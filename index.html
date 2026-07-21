@@ -221,6 +221,7 @@
     <button data-mode="match" onclick="switchMode('match')">🃏 配对</button>
     <button data-mode="write" onclick="switchMode('write')">✏️ 写字</button>
     <button data-mode="progress" onclick="switchMode('progress')">📊 进度</button>
+    <button data-mode="guide" onclick="switchMode('guide')">📚 家长指南</button>
   </div>
 
   <!-- 进度/课程选择器 -->
@@ -262,6 +263,11 @@
       <span id="matchResult" style="font-size:14px;font-weight:600;color:#7ec8a0;min-height:22px;"></span>
       <button onclick="initMatchGame()" style="padding:6px 20px;border:none;border-radius:30px;font-size:13px;font-weight:600;cursor:pointer;background:#f0e6dc;color:#7a6050;">🔄 重新洗牌</button>
     </div>
+  </div>
+
+  <!-- ===== 家长指南 ===== -->
+  <div class="card" id="guidePanel" style="display:none;text-align:left;padding:20px;overflow-y:auto;max-height:70vh;">
+    <div id="guideContent"></div>
   </div>
 
   <!-- ===== 写字 ===== -->
@@ -1142,6 +1148,144 @@ function updateProgressPanel() {
 function jumpFromWeak(i) { currentIndex = i; switchMode('learn'); renderChar(i); speakCurrent(); }
 
 // ================================================================
+// 家长指南
+// ================================================================
+function renderGuide() {
+  document.getElementById('guideContent').innerHTML = GUIDE_HTML;
+}
+
+const GUIDE_HTML = `
+<style>
+  .guide-wrap { font-family: "Noto Sans SC", "PingFang SC", sans-serif; color: #2a2825; }
+  .guide-wrap .stage-num { font-size: 11px; font-weight: 500; letter-spacing: 3px; color: #BA7517; margin-bottom: 12px; text-align: center; }
+  .guide-wrap h2 { font-family: "Noto Serif SC", serif; font-size: clamp(28px, 6vw, 42px); font-weight: 600; text-align: center; color: #2a2825; margin-bottom: 6px; }
+  .guide-wrap .age-range { text-align: center; font-size: 14px; color: #5a5750; margin-bottom: 14px; }
+  .guide-wrap .core-insight { display: block; max-width: 480px; margin: 0 auto 24px; font-size: 14px; color: #633806; background: #FAEEDA; padding: 10px 20px; border-radius: 50px; text-align: center; line-height: 1.6; }
+  
+  .guide-wrap .theory-band { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+  @media(max-width:500px){ .guide-wrap .theory-band { grid-template-columns: 1fr; } }
+  .guide-wrap .theory-card { background: #fff; border-radius: 16px; padding: 18px 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-top: 3px solid #EF9F27; }
+  .guide-wrap .theory-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: #BA7517; text-transform: uppercase; margin-bottom: 6px; }
+  .guide-wrap .theory-quote { font-family: "Noto Serif SC", serif; font-size: 14px; color: #2a2825; line-height: 1.7; }
+  
+  .guide-wrap .section-title { font-size: 12px; font-weight: 500; letter-spacing: 2px; color: #BA7517; text-transform: uppercase; margin-bottom: 12px; margin-top: 28px; }
+  .guide-wrap .core-card { background: #fff; border-radius: 16px; padding: 22px 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 12px; border-left: 4px solid #EF9F27; }
+  .guide-wrap .core-card h3 { font-size: 15px; font-weight: 500; color: #2a2825; margin-bottom: 12px; }
+  .guide-wrap .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .guide-wrap .bullet-list li { font-size: 13.5px; color: #5a5750; line-height: 1.65; padding-left: 16px; position: relative; }
+  .guide-wrap .bullet-list li::before { content: '→'; position: absolute; left: 0; color: #EF9F27; }
+  
+  .guide-wrap .role-card { background: #FAEEDA; border-radius: 16px; padding: 22px 24px; margin-bottom: 28px; border: 1px solid rgba(186,117,23,0.15); }
+  .guide-wrap .role-card .role-title { font-size: 14px; font-weight: 500; color: #633806; margin-bottom: 10px; }
+  .guide-wrap .role-card p { font-size: 13.5px; color: #633806; line-height: 1.7; }
+  
+  .guide-wrap .dont-grid { display: flex; flex-direction: column; gap: 10px; }
+  .guide-wrap .dont-item { background: #fff; border-radius: 16px; padding: 16px 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-left: 4px solid #A32D2D; }
+  .guide-wrap .dont-head { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 6px; }
+  .guide-wrap .dont-x { flex-shrink: 0; width: 20px; height: 20px; background: #FCEBEB; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #A32D2D; margin-top: 1px; }
+  .guide-wrap .dont-title { font-size: 14px; font-weight: 500; color: #2a2825; line-height: 1.4; }
+  .guide-wrap .dont-why { font-size: 12.5px; color: #5a5750; line-height: 1.65; padding-left: 30px; }
+  .guide-wrap .dont-why em { font-style: normal; color: #A32D2D; font-weight: 500; }
+  
+  .guide-wrap .guide-footer { margin-top: 28px; padding: 20px 0; border-top: 1px solid rgba(0,0,0,0.07); text-align: center; font-size: 12.5px; color: #9a9590; line-height: 1.8; }
+  .guide-wrap .nav-stages { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .guide-wrap .nav-stage { font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.07); color: #9a9590; background: #faf8f4; }
+  .guide-wrap .nav-stage.current { border-color: #EF9F27; color: #633806; background: #FAEEDA; }
+</style>
+<div class="guide-wrap">
+  <div class="stage-num">生命四周期 · 第三周期</div>
+  <h2>少年立志</h2>
+  <div class="age-range">7 — 14 岁</div>
+  <div class="core-insight">立志，不是让孩子立大志，而是让孩子第一次看见真正的自己</div>
+
+  <div class="theory-band">
+    <div class="theory-card">
+      <div class="theory-label">东方智慧 · 孔子</div>
+      <div class="theory-quote">「知之者不如好之者，好之者不如乐之者。」</div>
+    </div>
+    <div class="theory-card">
+      <div class="theory-label">Stanford · Tina Seelig</div>
+      <div class="theory-quote">"创造力的燃料，就是好奇 + 反馈。真正的成长来自行动，而非规划。"</div>
+    </div>
+  </div>
+
+  <div class="section-title">这个阶段，孩子在建构什么</div>
+  <div class="core-card">
+    <h3>少年立志的本质：人生第一次向内看</h3>
+    <ul class="bullet-list">
+      <li>孩子开始脱离父母视角，第一次问"我喜欢什么？我是谁？我想成为谁？"</li>
+      <li>兴趣多变不是三分钟热度，是孩子在向世界发问：<strong>"这里是不是属于我？"</strong></li>
+      <li>每一次沉浸（画画、研究飞机、踢球、写故事）都是Prototyping——做这件事我会忘记时间吗？</li>
+      <li>这个阶段最宝贵的不是成绩，而是"我有力量感"——我做对了哪些、我能靠自己完成一件事</li>
+      <li>当孩子能说"这件事让我觉得，我好像在变成我想成为的人"——志，就在悄悄萌芽</li>
+    </ul>
+  </div>
+
+  <div class="section-title">这个阶段，你的任务是什么</div>
+  <div class="role-card">
+    <div class="role-title">从「规划者」转为「让路者」</div>
+    <p>看见孩子的发光点，而不是急着定义它。允许孩子长时间沉浸某件事，给他试错的余地，让他体验真实的后果。孩子的志，不是我们替他定的，而是在无数真实的体验中慢慢长出来的。<br><br>父母能给的，是成为孩子<strong>可以安全探索的土壤</strong>——而不是预先铺好的轨道。</p>
+  </div>
+
+  <div class="section-title">🚫 父母不做清单</div>
+  <div class="dont-grid">
+    <div class="dont-item">
+      <div class="dont-head">
+        <div class="dont-x">✕</div>
+        <div class="dont-title">不把"三分钟热度"当问题</div>
+      </div>
+      <div class="dont-why">兴趣多变是立志萌芽期，每次"发光"都值得被看见，而非被定性为"不坚持"。<em>你的评判，可能提前终止了一次真实的探索。</em></div>
+    </div>
+    <div class="dont-item">
+      <div class="dont-head">
+        <div class="dont-x">✕</div>
+        <div class="dont-title">不聚焦结果忽视过程</div>
+      </div>
+      <div class="dont-why">只问"考了多少分"会让孩子把努力的意义外包给别人的评价。<em>多问"你做对了哪些？"才能建立内在力量感。</em></div>
+    </div>
+    <div class="dont-item">
+      <div class="dont-head">
+        <div class="dont-x">✕</div>
+        <div class="dont-title">不替孩子规划志向</div>
+      </div>
+      <div class="dont-why">志向不是父母替孩子定的，是在无数真实体验中慢慢长出来的。<em>父母的任务是让路，不是指路。</em></div>
+    </div>
+    <div class="dont-item">
+      <div class="dont-head">
+        <div class="dont-x">✕</div>
+        <div class="dont-title">不用比较来激励</div>
+      </div>
+      <div class="dont-why">比较会让孩子的注意力从"我能做什么"转向"我比别人差在哪"。<em>动力来自兴趣与被看见，不是羞耻与竞争。</em></div>
+    </div>
+    <div class="dont-item">
+      <div class="dont-head">
+        <div class="dont-x">✕</div>
+        <div class="dont-title">不打断孩子的沉浸状态</div>
+      </div>
+      <div class="dont-why">沉浸感（flow）是这个阶段发动机启动的标志。<em>一次深度沉浸，胜过十次浅层练习。</em></div>
+    </div>
+    <div class="dont-item">
+      <div class="dont-head">
+        <div class="dont-x">✕</div>
+        <div class="dont-title">不在完成小事后立刻批评不足</div>
+      </div>
+      <div class="dont-why">先放大小成功，才能给孩子继续冒险的勇气。<em>批评可以有，但时机和比例决定了一切。</em></div>
+    </div>
+  </div>
+
+  <div class="guide-footer">
+    <div class="nav-stages">
+      <span class="nav-stage">0-3岁 养性</span>
+      <span class="nav-stage">3-7岁 养正</span>
+      <span class="nav-stage current">7-14岁 少年立志</span>
+      <span class="nav-stage">14-21岁 青年养德</span>
+    </div>
+    这是一份家长认知指南，帮助你看见、理解、调整自己——而不是评判孩子。<br>每个孩子都有自己的节奏，每位父母也都在学习成为更好的陪伴者。
+  </div>
+</div>
+`;
+
+// ================================================================
 // 自定义字表
 // ================================================================
 function applyCustomWords() {
@@ -1228,11 +1372,13 @@ function switchMode(newMode) {
   document.getElementById('matchPanel').style.display = newMode === 'match' ? 'block' : 'none';
   document.getElementById('writePanel').style.display = newMode === 'write' ? 'block' : 'none';
   document.getElementById('progressPanel').style.display = newMode === 'progress' ? 'block' : 'none';
+  document.getElementById('guidePanel').style.display = newMode === 'guide' ? 'block' : 'none';
   if (newMode === 'learn') renderChar(currentIndex);
   if (newMode === 'quiz') { generateQuiz(); renderQuiz(); }
   if (newMode === 'match') initMatchGame();
   if (newMode === 'write') { document.getElementById('writeCharRef').textContent = (getActiveWords()[currentIndex]||{}).char || '大'; setTimeout(initCanvas, 50); }
   if (newMode === 'progress') updateProgressPanel();
+  if (newMode === 'guide') renderGuide();
 }
 
 // ================================================================
