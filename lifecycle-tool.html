@@ -24,24 +24,6 @@ body{background:var(--paper);font-family:'Noto Sans SC',sans-serif;color:var(--i
 .screen.active{display:flex;animation:fadeIn .45s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
-/* ── S0: 验证码 ── */
-#s0{background:linear-gradient(160deg,#fdf6e8 0%,#f5f0e6 50%,#faf8f3 100%);text-align:center}
-#s0 .lock-icon{font-size:48px;margin-bottom:16px}
-#s0 h2{font-family:'Noto Serif SC',serif;font-size:clamp(22px,5vw,30px);font-weight:700;margin-bottom:8px}
-#s0 .sub{font-size:14px;color:var(--ink2);margin-bottom:24px}
-.code-input-wrap{display:flex;gap:8px;max-width:340px;margin:0 auto 16px;flex-wrap:wrap;justify-content:center}
-.code-input-wrap input{flex:1;min-width:200px;padding:14px 18px;border:2px solid #e0d8cc;border-radius:14px;font-size:16px;font-family:monospace;text-align:center;letter-spacing:3px;outline:none;background:#fff;transition:border-color .2s}
-.code-input-wrap input:focus{border-color:var(--gold)}
-.code-input-wrap input.error{border-color:var(--red);animation:shake .3s}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.code-btn{padding:14px 32px;border:none;border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;background:var(--ink);color:#fff;transition:all .2s}
-.code-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,0.15)}
-.code-msg{font-size:13px;min-height:24px;margin-top:4px}
-.code-msg.ok{color:var(--green)}
-.code-msg.err{color:var(--red)}
-.code-footer{margin-top:24px;font-size:12px;color:var(--ink3)}
-.code-footer a{color:var(--gold);text-decoration:none}
-
 /* ── S1: INTRO ── */
 #s1{background:linear-gradient(160deg,#fdf6e8 0%,#f5f0e6 50%,#faf8f3 100%);text-align:center;position:relative;overflow:hidden}
 #s1::before{content:'';position:absolute;top:-120px;right:-120px;width:400px;height:400px;background:radial-gradient(circle,rgba(201,146,42,.12) 0%,transparent 65%);border-radius:50%}
@@ -179,35 +161,7 @@ body{background:var(--paper);font-family:'Noto Sans SC',sans-serif;color:var(--i
 </head>
 <body>
 
-<div class="screen active" id="s0">
-  <div class="lock-icon">🔐</div>
-  <h2>验证码验证</h2>
-  <p class="sub">请输入您购买的验证码以解锁完整工具</p>
-  <div class="code-input-wrap">
-    <input type="text" id="codeInput" placeholder="输入验证码" maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter')verifyCode()">
-    <button class="code-btn" onclick="verifyCode()">验证</button>
-  </div>
-  <div class="code-msg" id="codeMsg"></div>
-  <p class="code-footer">没有验证码？<a href="#" onclick="showBuyGuide()">如何获取 →</a></p>
-  <div id="buyGuide" style="display:none;margin-top:20px;max-width:340px;margin-left:auto;margin-right:auto;">
-    <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:var(--sh);">
-      <p style="font-size:14px;color:var(--ink2);margin-bottom:12px;">💳 购买验证码后解锁全部内容</p>
-      <div style="background:var(--warm);border-radius:12px;padding:16px;margin-bottom:12px;">
-        <p style="font-size:13px;color:var(--ink);line-height:1.7;">
-          <strong>📱 方式一：微信扫码支付</strong><br>
-          扫描下方二维码付款后，<br>
-          在微信中发送「验证码」即可获取
-        </p>
-      </div>
-      <div id="buyQR" style="background:#fff;padding:8px;border-radius:12px;border:2px dashed #e0d8cc;margin-bottom:12px;text-align:center;">
-        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Crect width='160' height='160' fill='%23f5f0e6'/%3E%3Ctext x='80' y='65' text-anchor='middle' fill='%239a9590' font-size='13' font-family='sans-serif'%3E请填入%3C/text%3E%3Ctext x='80' y='85' text-anchor='middle' fill='%239a9590' font-size='13' font-family='sans-serif'%3EPAY_QR_IMAGE%3C/text%3E%3Ctext x='80' y='105' text-anchor='middle' fill='%239a9590' font-size='13' font-family='sans-serif'%3E变量%3C/text%3E%3C/svg%3E" alt="付款码" style="width:160px;height:160px;border-radius:8px;">
-      </div>
-      <p style="font-size:12px;color:var(--ink3);">💰 价格：请自行设定</p>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="s1">
+<div class="screen active" id="s1">
   <div class="badge">生命四周期 · 家长认知指南</div>
   <h1 class="hero-title">你的孩子<br>现在在哪个<br>生命周期？</h1>
   <p class="hero-sub">选择孩子的年龄，获取这个阶段最精准的认知指南——包括他正在经历什么，以及你最不该做的事。</p>
@@ -243,11 +197,12 @@ for(let i=0;i<=21;i++){
 }
 
 // ═══════════════════════════════════════════
-// 配置：付款码
-// 把你的微信/支付宝收款码图片上传后，把下面的路径改成实际地址
-// 例如: "https://ryan-102.github.io/literacy-app/pay-qr.png"
+// 配置
+// 1. 发卡平台链接：用户点击后跳转到你的发卡平台购买页面
+// 2. 付款码：你的微信/支付宝收款码图片地址（可选）
 // ═══════════════════════════════════════════
-const PAY_QR_IMAGE = ""; // ← 在这里填入你的付款码图片地址
+const FAKA_URL = "https://YOUR_FAKA_PLATFORM_URL";  // ← 发卡平台链接
+const PAY_QR_IMAGE = "";  // ← 付款码图片地址（可选）
 
 // ── DATA ──
 const YEARS = {
@@ -454,14 +409,14 @@ function renderResult(s,yr,age){
           </div>
         </div>
 
-        <!-- 付款码 -->
+        <!-- 购买区 -->
         <div class="pay-box" style="text-align:center;background:var(--card);border-radius:20px;padding:32px 24px;box-shadow:var(--sh);margin-bottom:20px;">
-          <h3 style="font-family:'Noto Serif SC',serif;font-size:16px;margin-bottom:6px;">☕ 如果这份指南对你有帮助</h3>
-          <p style="font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:16px;">你的支持，能帮助我们持续创作更多优质内容。<br>长按识别二维码，请我们喝杯咖啡 ☕</p>
-          <div style="display:inline-block;background:#fff;padding:12px;border-radius:16px;border:2px dashed #e0d8cc;">
-            <img id="payQRCode" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23f5f0e6'/%3E%3Ctext x='90' y='70' text-anchor='middle' fill='%239a9590' font-size='14' font-family='sans-serif'%3E请上传付款码%3C/text%3E%3Ctext x='90' y='100' text-anchor='middle' fill='%239a9590' font-size='12' font-family='sans-serif'%3E替换 PAY_QR_IMAGE%3C/text%3E%3Ctext x='90' y='120' text-anchor='middle' fill='%239a9590' font-size='12' font-family='sans-serif'%3E变量%3C/text%3E%3C/svg%3E" alt="赞赏码" style="width:180px;height:180px;display:block;border-radius:8px;">
+          <h3 style="font-family:'Noto Serif SC',serif;font-size:16px;margin-bottom:6px;">💎 解锁完整版</h3>
+          <p style="font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:16px;">完整版包含更详细的阶段分析、个性化建议和持续更新。<br>👇 点击下方按钮购买</p>
+          <div class="sbtns">
+            <button class="sbtn p" onclick="window.open(FAKA_URL || 'about:blank','_blank')">🛒 立即购买 (¥9.9)</button>
           </div>
-          <p style="font-size:12px;color:var(--ink3);margin-top:12px;">微信 / 支付宝 均可</p>
+          <p style="font-size:11px;color:var(--ink3);margin-top:10px;">购买后系统自动发送验证码到您的微信</p>
         </div>
         <div class="snav">${pills}</div>
       </div>
@@ -470,130 +425,6 @@ function renderResult(s,yr,age){
 
 function jumpStage(startAge){selAge=startAge;const s=getStage(startAge);const yr=YEARS[startAge];if(s){renderResult(s,yr,startAge);window.scrollTo(0,0);}}
 function copyLink(){navigator.clipboard.writeText(window.location.href).then(()=>alert('链接已复制，快去分享吧')).catch(()=>alert('请手动复制当前页面链接'));}
-
-// 初始化付款码
-if(PAY_QR_IMAGE){document.getElementById('payQRCode').src=PAY_QR_IMAGE;}
-
-// ═══════════════════════════════════════════
-// 🔐 验证码系统
-// ═══════════════════════════════════════════
-
-// 使用说明：
-// 1. 运行 generateCodes() 生成一批验证码
-// 2. 把生成的 SHA256 哈希值填入 VALID_CODE_HASHES 数组
-// 3. 把明文的验证码发给已付款的用户
-// 4. 用户输入验证码，系统会自动校验
-
-// 已激活的验证码列表（填入 SHA256 哈希值）
-// 格式: 每行一个哈希值，用逗号分隔
-const VALID_CODE_HASHES = [
-  // 在这里填入生成的哈希值，例如：
-  // "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
-];
-
-// 本地存储键名
-const STORAGE_KEY = 'lifecycle_unlocked';
-
-// SHA256 哈希函数
-async function sha256(text) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(text);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-// 验证验证码
-async function verifyCode() {
-  const input = document.getElementById('codeInput');
-  const msg = document.getElementById('codeMsg');
-  const code = input.value.trim().toUpperCase();
-  
-  if (!code) {
-    msg.className = 'code-msg err';
-    msg.textContent = '⚠️ 请输入验证码';
-    input.focus();
-    return;
-  }
-  
-  msg.textContent = '⏳ 验证中...';
-  msg.className = 'code-msg';
-  
-  // 计算哈希并对比
-  const hash = await sha256(code);
-  
-  if (VALID_CODE_HASHES.includes(hash)) {
-    // 验证成功
-    localStorage.setItem(STORAGE_KEY, 'true');
-    msg.className = 'code-msg ok';
-    msg.textContent = '✅ 验证成功！正在进入...';
-    setTimeout(() => go('s1'), 600);
-  } else {
-    input.className = 'error';
-    setTimeout(() => input.classList.remove('error'), 500);
-    msg.className = 'code-msg err';
-    msg.textContent = '❌ 验证码无效，请检查后重试';
-  }
-}
-
-// 显示购买指南
-function showBuyGuide() {
-  const guide = document.getElementById('buyGuide');
-  if (guide.style.display !== 'block') {
-    guide.style.display = 'block';
-    // 如果配置了付款码，也显示在购买指南中
-    if (PAY_QR_IMAGE) {
-      document.getElementById('buyQR').innerHTML = '<img src="' + PAY_QR_IMAGE + '" alt="付款码" style="width:160px;height:160px;border-radius:8px;">';
-    }
-  } else {
-    guide.style.display = 'none';
-  }
-}
-
-// 页面加载时检查是否已解锁
-(async function() {
-  if (localStorage.getItem(STORAGE_KEY) === 'true') {
-    go('s1');
-  }
-})();
-
-// ═══════════════════════════════════════════
-// 🛠️ 验证码生成工具（管理员用）
-// 运行方式: 在浏览器控制台执行 generateCodes()
-// ═══════════════════════════════════════════
-/*
-// 取消注释即可使用
-async function generateCodes(count = 10) {
-  const codes = [];
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  
-  for (let i = 0; i < count; i++) {
-    let code = '';
-    for (let j = 0; j < 4; j++) {
-      code += chars[Math.floor(Math.random() * chars.length)];
-    }
-    code += '-';
-    for (let j = 0; j < 4; j++) {
-      code += chars[Math.floor(Math.random() * chars.length)];
-    }
-    const friendly = code;
-    const hash = await sha256(friendly);
-    codes.push({ code: friendly, hash });
-  }
-  
-  console.log('=== 生成的验证码（发给用户）===');
-  codes.forEach(c => console.log(c.code));
-  
-  console.log('\n=== 填入 VALID_CODE_HASHES 的哈希值 ===');
-  console.log('const VALID_CODE_HASHES = [');
-  codes.forEach(c => console.log('  "' + c.hash + '",'));
-  console.log('];');
-  
-  return codes;
-}
-
-// 在控制台执行: generateCodes()
-*/
 </script>
 </body>
 </html>
